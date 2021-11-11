@@ -20,14 +20,32 @@ class Homeseer(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
         print('****************');
-        x = threading.Thread(target=thread_function, args=("255.255.255.255", 10666))
-        #x = threading.Thread(target=thread_function, args=("192.168.0.131", 10666))
+
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 1))  # connect() for UDP doesn't send packets
+        local_ip = s.getsockname()[0]
+        local_ip = local_ip[:local_ip.rfind('.')+1] + '255'
+        
+        broadcast = self.GetBroadcastAddr()
+
+        #x = threading.Thread(target=thread_function, args=("255.255.255.255", 10666))
+        #x = threading.Thread(target=thread_function, args=(local_ip, 10666))
+        x = threading.Thread(target=thread_function, args=(broadcast, 10666))
+
         x.start()        
+
         print('****************');
 
     @intent_file_handler('homeseer.intent')
     def handle_homeseer(self, message):
         self.speak_dialog('homeseer')
+
+
+    def GetBroadcastAddr(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 1))  # connect() for UDP doesn't send packets
+        local_ip = s.getsockname()[0]
+        return local_ip[:local_ip.rfind('.')+1] + '255'
 
 
 def create_skill():
