@@ -1,2 +1,1 @@
-List events
-List devices
+switch (device) (on|off)
